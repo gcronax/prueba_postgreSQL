@@ -10,16 +10,18 @@ public class tablas {
     public static String auxname;
     public static String auxnametabla;
     public static String[] cabecera;
+    public static int[] tipos;
 
     public static void menuTablas(String name,String nametable) {
         tablas.auxname=name;
         tablas.auxnametabla=nametable;
         try {
             tablas.cabecera=obtenerCabecera();
+            tablas.tipos=obtenerTipo();
             Scanner scan= new Scanner(System.in);
             int aux;
             do {
-                System.out.println("dime que deseas hacer: " +
+                System.out.println("dime que deseas hacer en "+auxnametabla+": " +
                         "\n 1 consultar datos" +
                         "\n 2 añadir "+auxname+"" +
                         "\n 3 eliminar "+auxname+"" +
@@ -224,60 +226,47 @@ public class tablas {
         }
     }
     public static void actualizar() {
-        Statement stmt = null;
-        ResultSet rs = null;
-        String[] columnasaux = new String[0];
-        int[] auxtipo =new  int[0];
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Ingrese el ID del "+auxname+" que desea actualizar: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+
+        System.out.println("Dime que campo quieres actualizar: ");
+        for (int i = 1; i < cabecera.length; i++) {
+            System.out.println(i+" "+cabecera[i]);
+        }
+
+        int select = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.print("Ingrese el valor a cambiar: ");
+        String fi = scanner.nextLine();
+
+
+        PreparedStatement pstmt = null;
 
         Connection conn = null;
 
         try {
-            conn = closedisc.connect(); //abrir conexión
-// Crear una declaración
-            stmt = conn.createStatement();
-// Ejecutar consulta SQL
-            rs = stmt.executeQuery("SELECT * FROM " + auxnametabla + "");
-// Procesar los resultados
-            ResultSetMetaData metaData = rs.getMetaData();
-            // Obtener el número de columnas
-            int columnCount = metaData.getColumnCount();
-            // Definir los nombres de las columnas
-            String[] columnas = new String[columnCount];
-            int[] columnastipo = new int[columnCount];
-
-            for (int i = 1; i <= columnCount; i++) {
-                columnas[i - 1] = metaData.getColumnName(i); // Guardar el valor de la columna en el array
-                columnastipo[i - 1] = metaData.getColumnType(i); // Guardar el valor de la columna en el array
-
-            }
-            columnasaux = columnas;
-            auxtipo = columnastipo;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        //System.out.println(Arrays.toString(columnasaux));
-
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Ingrese el ID del "+auxname+" que desea actualizar: ");
-        String id_contrato = scanner.nextLine();
-
-
-
-
-        System.out.print("Ingrese el pago_mensual actualizado del inquilino: ");
-        int pago_mensual = scanner.nextInt();
-        PreparedStatement pstmt = null;
-
-
-
-
-
-        try {
+            conn = closedisc.connect();
 // Preparar la sentencia SQL para actualizar el nombre del empleado
-            String sql = "UPDATE "+auxnametabla+" SET pago_mensual = ? WHERE "+columnasaux[0]+" = ?";
+            String sql = "UPDATE "+auxnametabla+" SET "+cabecera[select]+" = ? WHERE "+cabecera[0]+" = ?";
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, pago_mensual);
-            pstmt.setString(2, id_contrato);
+
+            //System.out.println(auxtipo[i]); //ayuda a saber el tipo de de dato
+            if(tipos[select]==12){
+                pstmt.setString(1, fi);
+            }if(tipos[select]==4){
+                pstmt.setInt(1, Integer.parseInt(fi));
+            }if(tipos[select]==2){
+                pstmt.setDouble(1, Double.parseDouble(fi));
+            }if(tipos[select]==91){
+                pstmt.setDate(1, java.sql.Date.valueOf(fi));
+            }
+
+            pstmt.setInt(2, id);
 // Ejecutar el UPDATE
             int rowsUpdated = pstmt.executeUpdate();
             if (rowsUpdated > 0) {
@@ -338,5 +327,48 @@ public class tablas {
         }
         //System.out.println(Arrays.toString(columnasaux));
         return columnasaux;
+    }
+    public static int[] obtenerTipo(){
+        Statement stmt = null;
+        ResultSet rs = null;
+        String[] columnasaux = new String[0];
+        int[] auxtipo =new  int[0];
+        Connection conn = null;
+
+        try {
+            conn = closedisc.connect(); //abrir conexión
+// Crear una declaración
+            stmt = conn.createStatement();
+// Ejecutar consulta SQL
+            rs = stmt.executeQuery("SELECT * FROM "+auxnametabla+"");
+// Procesar los resultados
+            ResultSetMetaData metaData = rs.getMetaData();
+            // Obtener el número de columnas
+            int columnCount = metaData.getColumnCount();
+            // Definir los nombres de las columnas
+            String[] columnas = new String[columnCount];
+            int[] columnastipo = new int[columnCount];
+
+            for (int i = 1; i <= columnCount; i++) {
+                columnas[i - 1] = metaData.getColumnName(i); // Guardar el valor de la columna en el array
+                columnastipo[i - 1] = metaData.getColumnType(i); // Guardar el valor de la columna en el array
+
+            }
+            columnasaux=columnas;
+            auxtipo=columnastipo;
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if (conn != null) closedisc.disconnect(conn);
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        //System.out.println(Arrays.toString(columnasaux));
+        return auxtipo;
     }
 }
