@@ -1,6 +1,7 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import static javax.management.remote.JMXConnectorFactory.connect;
@@ -8,12 +9,13 @@ import static javax.management.remote.JMXConnectorFactory.connect;
 public class tablas {
     public static String auxname;
     public static String auxnametabla;
-    public static String[] cabecera=obtenerCabecera();
+    public static String[] cabecera;
 
     public static void menuTablas(String name,String nametable) {
         tablas.auxname=name;
         tablas.auxnametabla=nametable;
         try {
+            tablas.cabecera=obtenerCabecera();
             Scanner scan= new Scanner(System.in);
             int aux;
             do {
@@ -24,7 +26,6 @@ public class tablas {
                         "\n 4 actualizar "+auxname+"" +
                         "\n 0 finalizar consulta");
                 aux=scan.nextInt();
-
                 switch (aux){
                     case 1 -> consultar();
                     case 2 -> insertar();
@@ -43,7 +44,7 @@ public class tablas {
         Connection conn = null;
 
         try {
-            conn = aux.connect(); //abrir conexión
+            conn = closedisc.connect(); //abrir conexión
 
 // Crear una declaración
             stmt = conn.createStatement();
@@ -84,7 +85,7 @@ public class tablas {
             System.out.println(e.getMessage());
         } finally {
             try {
-                if (conn != null) aux.disconnect(conn);
+                if (conn != null) closedisc.disconnect(conn);
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
             } catch (Exception ex) {
@@ -100,7 +101,7 @@ public class tablas {
         Connection conn = null;
 
         try {
-            conn = aux.connect(); //abrir conexión
+            conn = closedisc.connect(); //abrir conexión
 // Crear una declaración
             stmt = conn.createStatement();
 // Ejecutar consulta SQL
@@ -183,7 +184,7 @@ public class tablas {
             System.out.println("Error al insertar "+auxname+": " + e.getMessage());
         } finally {
             try {
-                if (conn != null) aux.disconnect(conn);
+                if (conn != null) closedisc.disconnect(conn);
                 if (pstmt != null) pstmt.close();
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
@@ -200,7 +201,7 @@ public class tablas {
         Connection conn = null;
 
         try {
-            conn = aux.connect(); //abrir conexión
+            conn = closedisc.connect(); //abrir conexión
 // Preparar la sentencia SQL para eliminar el empleado por ID
             String sql = "DELETE FROM "+auxnametabla+" WHERE "+tablas.cabecera[0]+" = ?";
             pstmt = conn.prepareStatement(sql);
@@ -231,7 +232,7 @@ public class tablas {
         Connection conn = null;
 
         try {
-            conn = aux.connect(); //abrir conexión
+            conn = closedisc.connect(); //abrir conexión
 // Crear una declaración
             stmt = conn.createStatement();
 // Ejecutar consulta SQL
@@ -287,7 +288,7 @@ public class tablas {
         } catch (Exception e) {
             System.out.println("Error al actualizar el "+auxname+": " + e.getMessage());
         } finally {
-            aux.disconnect(conn);
+            closedisc.disconnect(conn);
             try {
                 if (pstmt != null) pstmt.close();
             } catch (Exception ex) {
@@ -303,7 +304,7 @@ public class tablas {
         Connection conn = null;
 
         try {
-            conn = aux.connect(); //abrir conexión
+            conn = closedisc.connect(); //abrir conexión
 // Crear una declaración
             stmt = conn.createStatement();
 // Ejecutar consulta SQL
@@ -328,13 +329,14 @@ public class tablas {
             System.out.println(e.getMessage());
         } finally {
             try {
-                if (conn != null) aux.disconnect(conn);
+                if (conn != null) closedisc.disconnect(conn);
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
         }
+        //System.out.println(Arrays.toString(columnasaux));
         return columnasaux;
     }
 }
