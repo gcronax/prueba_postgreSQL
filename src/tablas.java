@@ -1,18 +1,18 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
-import java.util.Arrays;
 import java.util.Scanner;
 
 import static javax.management.remote.JMXConnectorFactory.connect;
 
-public class pisos {
+public class tablas {
     public static String auxname;
     public static String auxnametabla;
+    public static String[] cabecera=obtenerCabecera();
 
-    public static void menuPisos(String name,String nametable) {
-        pisos.auxname=name;
-        pisos.auxnametabla=nametable;
+    public static void menuTablas(String name,String nametable) {
+        tablas.auxname=name;
+        tablas.auxnametabla=nametable;
         try {
             Scanner scan= new Scanner(System.in);
             int aux;
@@ -60,7 +60,6 @@ public class pisos {
             }
 
             JFrame frame = new JFrame("Listado de "+auxnametabla+"");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(900, 400);
 
 
@@ -170,11 +169,9 @@ public class pisos {
                     pstmt.setInt(i, Integer.parseInt(nombresCampos[i]));
                 }if(auxtipo[i]==2){
                     pstmt.setDouble(i, Double.parseDouble(nombresCampos[i]));
+                }if(auxtipo[i]==91){
+                    pstmt.setDate(i, java.sql.Date.valueOf(nombresCampos[i]));
                 }
-
-
-
-
 
             }
 
@@ -196,7 +193,7 @@ public class pisos {
     public static void eliminar() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Ingrese el ID de "+auxname+" que desea eliminar: ");
-        int id_contrato = scanner.nextInt();
+        int id = scanner.nextInt();
         scanner.nextLine();
         PreparedStatement pstmt = null;
 
@@ -205,9 +202,9 @@ public class pisos {
         try {
             conn = aux.connect(); //abrir conexión
 // Preparar la sentencia SQL para eliminar el empleado por ID
-            String sql = "DELETE FROM "+auxnametabla+" WHERE id_contrato = ?";
+            String sql = "DELETE FROM "+auxnametabla+" WHERE "+tablas.cabecera[0]+" = ?";
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, id_contrato);
+            pstmt.setInt(1, id);
 // Ejecutar el DELETE
             int rowsDeleted = pstmt.executeUpdate();
             if (rowsDeleted > 0) {
@@ -297,5 +294,47 @@ public class pisos {
                 System.out.println(ex.getMessage());
             }
         }
+    }
+    public static String[] obtenerCabecera(){
+        Statement stmt = null;
+        ResultSet rs = null;
+        String[] columnasaux = new String[0];
+        int[] auxtipo =new  int[0];
+        Connection conn = null;
+
+        try {
+            conn = aux.connect(); //abrir conexión
+// Crear una declaración
+            stmt = conn.createStatement();
+// Ejecutar consulta SQL
+            rs = stmt.executeQuery("SELECT * FROM "+auxnametabla+"");
+// Procesar los resultados
+            ResultSetMetaData metaData = rs.getMetaData();
+            // Obtener el número de columnas
+            int columnCount = metaData.getColumnCount();
+            // Definir los nombres de las columnas
+            String[] columnas = new String[columnCount];
+            int[] columnastipo = new int[columnCount];
+
+            for (int i = 1; i <= columnCount; i++) {
+                columnas[i - 1] = metaData.getColumnName(i); // Guardar el valor de la columna en el array
+                columnastipo[i - 1] = metaData.getColumnType(i); // Guardar el valor de la columna en el array
+
+            }
+            columnasaux=columnas;
+            auxtipo=columnastipo;
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if (conn != null) aux.disconnect(conn);
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        return columnasaux;
     }
 }

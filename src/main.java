@@ -15,9 +15,9 @@ public class main {
             aux=scan.nextInt();
 
             switch (aux){
-                case 1 -> pisos.menuPisos("piso","pisos");
-                case 2 -> pisos.menuPisos("piso","pisos");
-                case 3 -> pisos.menuPisos("piso","pisos");
+                case 1 -> tablas.menuTablas("piso","pisos");
+                case 2 -> tablas.menuTablas("propietario","propietarios");
+                case 3 -> tablas.menuTablas("inquilino","inquilinos");
             }
         }while (aux!=0);
     }
