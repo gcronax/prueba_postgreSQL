@@ -16,6 +16,7 @@ public class tablas {
             "jdbc:postgresql://89.36.214.106:5432/geo_1cfsl_3267g";
     private static final String USER = "geo_1cfsl_3267g";
     private static final String PASSWORD = "geo_1cfsl_3267g";
+
     public static Connection connect() {
         Connection conn = null;
         try {
