@@ -12,6 +12,31 @@ public class tablas {
     public static String[] cabecera;
     public static int[] tipos;
     private static JFrame frame = null;
+    private static final String URL =
+            "jdbc:postgresql://89.36.214.106:5432/geo_1cfsl_3267g";
+    private static final String USER = "geo_1cfsl_3267g";
+    private static final String PASSWORD = "geo_1cfsl_3267g";
+    public static Connection connect() {
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(URL, USER, PASSWORD);
+            System.out.println("Conexión establecida con la Base de datos");
+        } catch (SQLException e) {
+            System.out.println("Error al conectar a la base de datos");
+            e.printStackTrace();
+        }
+        return conn;
+    }
+    public static void disconnect(Connection conn) {
+        try {
+            if (conn != null) {
+                conn.close();
+                System.out.println("Conexión cerrada");
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error: " + ex.getMessage());
+        }
+    }
 
     public static void menuTablas(String name,String nametable) {
         tablas.auxname=name;
@@ -47,7 +72,7 @@ public class tablas {
         Connection conn = null;
 
         try {
-            conn = closedisc.connect(); //abrir conexión
+            conn = connect(); //abrir conexión
 
 // Crear una declaración
             stmt = conn.createStatement();
@@ -96,7 +121,7 @@ public class tablas {
             System.out.println(e.getMessage());
         } finally {
             try {
-                if (conn != null) closedisc.disconnect(conn);
+                if (conn != null) disconnect(conn);
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
             } catch (Exception ex) {
@@ -112,7 +137,7 @@ public class tablas {
         Connection conn = null;
 
         try {
-            conn = closedisc.connect(); //abrir conexión
+            conn = connect(); //abrir conexión
 // Crear una declaración
             stmt = conn.createStatement();
 // Ejecutar consulta SQL
@@ -195,7 +220,7 @@ public class tablas {
             System.out.println("Error al insertar "+auxname+": " + e.getMessage());
         } finally {
             try {
-                if (conn != null) closedisc.disconnect(conn);
+                if (conn != null) disconnect(conn);
                 if (pstmt != null) pstmt.close();
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
@@ -212,7 +237,7 @@ public class tablas {
         Connection conn = null;
 
         try {
-            conn = closedisc.connect(); //abrir conexión
+            conn = connect(); //abrir conexión
 // Preparar la sentencia SQL para eliminar el empleado por ID
             String sql = "DELETE FROM "+auxnametabla+" WHERE "+tablas.cabecera[0]+" = ?";
             pstmt = conn.prepareStatement(sql);
@@ -259,7 +284,7 @@ public class tablas {
         Connection conn = null;
 
         try {
-            conn = closedisc.connect();
+            conn = connect();
 // Preparar la sentencia SQL para actualizar el nombre del empleado
             String sql = "UPDATE "+auxnametabla+" SET "+cabecera[select]+" = ? WHERE "+cabecera[0]+" = ?";
             pstmt = conn.prepareStatement(sql);
@@ -286,7 +311,7 @@ public class tablas {
         } catch (Exception e) {
             System.out.println("Error al actualizar el "+auxname+": " + e.getMessage());
         } finally {
-            closedisc.disconnect(conn);
+            disconnect(conn);
             try {
                 if (pstmt != null) pstmt.close();
             } catch (Exception ex) {
@@ -302,7 +327,7 @@ public class tablas {
         Connection conn = null;
 
         try {
-            conn = closedisc.connect(); //abrir conexión
+            conn = connect(); //abrir conexión
 // Crear una declaración
             stmt = conn.createStatement();
 // Ejecutar consulta SQL
@@ -327,7 +352,7 @@ public class tablas {
             System.out.println(e.getMessage());
         } finally {
             try {
-                if (conn != null) closedisc.disconnect(conn);
+                if (conn != null) disconnect(conn);
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
             } catch (Exception ex) {
@@ -345,7 +370,7 @@ public class tablas {
         Connection conn = null;
 
         try {
-            conn = closedisc.connect(); //abrir conexión
+            conn = connect(); //abrir conexión
 // Crear una declaración
             stmt = conn.createStatement();
 // Ejecutar consulta SQL
@@ -370,7 +395,7 @@ public class tablas {
             System.out.println(e.getMessage());
         } finally {
             try {
-                if (conn != null) closedisc.disconnect(conn);
+                if (conn != null) disconnect(conn);
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
             } catch (Exception ex) {
