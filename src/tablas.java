@@ -11,6 +11,7 @@ public class tablas {
     public static String auxnametabla;
     public static String[] cabecera;
     public static int[] tipos;
+    private static JFrame frame = null;
 
     public static void menuTablas(String name,String nametable) {
         tablas.auxname=name;
@@ -62,13 +63,10 @@ public class tablas {
                 columnas[i - 1] = metaData.getColumnName(i); // Guardar el valor de la columna en el array
             }
 
-            JFrame frame = new JFrame("Listado de "+auxnametabla+"");
-            frame.setSize(900, 400);
-
-
-            // Crear modelo de la tabla
             DefaultTableModel modelo = new DefaultTableModel(columnas, 0);
             JTable tabla = new JTable(modelo);
+            modelo.setRowCount(0);
+
             while (rs.next()) {
                 // Crear un array para almacenar los valores de la fila
                 Object[] fila = new Object[columnCount];
@@ -79,8 +77,19 @@ public class tablas {
                 }
                 modelo.addRow(fila);
             }
-            JScrollPane scrollPane = new JScrollPane(tabla);
-            frame.add(scrollPane);
+            if (frame == null) {
+                frame = new JFrame("Listado de " + auxnametabla + "");
+                frame.setSize(900, 400);
+                JScrollPane scrollPane = new JScrollPane(tabla);
+                frame.add(scrollPane);
+                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            } else {
+                frame.getContentPane().removeAll();
+                JScrollPane scrollPane = new JScrollPane(tabla);
+                frame.add(scrollPane);
+                frame.revalidate();
+                frame.repaint();
+            }
             // Mostrar la ventana
             frame.setVisible(true);
         } catch (Exception e) {
