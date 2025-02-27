@@ -110,6 +110,7 @@ public class tablas {
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             } else {
                 frame.getContentPane().removeAll();
+                frame.setTitle("Listado de "+ auxnametabla);
                 JScrollPane scrollPane = new JScrollPane(tabla);
                 frame.add(scrollPane);
                 frame.revalidate();
@@ -207,7 +208,7 @@ public class tablas {
                 }if(auxtipo[i]==2){
                     pstmt.setDouble(i, Double.parseDouble(nombresCampos[i]));
                 }if(auxtipo[i]==91){
-                    pstmt.setDate(i, java.sql.Date.valueOf(nombresCampos[i]));
+                    pstmt.setDate(i, Date.valueOf(nombresCampos[i]));
                 }
 
             }
@@ -297,7 +298,7 @@ public class tablas {
             }if(tipos[select]==2){
                 pstmt.setDouble(1, Double.parseDouble(fi));
             }if(tipos[select]==91){
-                pstmt.setDate(1, java.sql.Date.valueOf(fi));
+                pstmt.setDate(1, Date.valueOf(fi));
             }
 
             pstmt.setInt(2, id);
